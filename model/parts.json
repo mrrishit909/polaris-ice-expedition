@@ -1,0 +1,14 @@
+{
+  "_doc": "Asset contract for the POLARIS expedition kit. Blender is Z-up, the GLB is Y-up (glTF z = -Blender y). The rover and the sled face -z (Blender +y). One scene unit is 1 unit; the map draws 1 unit = 2 km, so the vehicles are exaggerated on purpose. Every browser-controlled part has a stable name and a pivot at its hinge, axle or centre. Ice chunks are one cell of the map (2.5 units): a separate low-poly top surface with UVs and a darker body, so the browser can colour and fracture the top. Proxy_Rover is the analysis volume and is never drawn.",
+  "rover": {"length": 1.8, "width": 1.1, "height": 0.85, "wheelsPerSide": 5, "bogies": 2, "mass_t": 6.5},
+  "chunk": {"size": 2.5, "variants": ["A", "B", "C", "D"], "topSegments": 4},
+  "groups": {
+    "rover": ["Rover_Body", "Rover_Cab", "Rover_Track_L", "Rover_Track_R", "Rover_Bogie_L", "Rover_Bogie_R", "Rover_Lamp_L", "Rover_Lamp_R", "Rover_Dish", "Rover_Antenna"],
+    "wheels": {"prefix": "Rover_Wheel_", "sides": ["L", "R"], "count": 5},
+    "sled": ["Sled_Body", "Sled_Runner_L", "Sled_Runner_R", "Sled_Hitch", "Sled_Cargo_0", "Sled_Cargo_1", "Sled_Cargo_2"],
+    "camp": ["Camp_Dome_0", "Camp_Dome_1", "Camp_Dome_2", "Camp_Mast", "Camp_Flag", "Camp_Fuel_0", "Camp_Fuel_1", "Camp_Fuel_2", "Camp_Fuel_3"],
+    "ice": ["IceChunk_A_Top", "IceChunk_A_Body", "IceChunk_B_Top", "IceChunk_B_Body", "IceChunk_C_Top", "IceChunk_C_Body", "IceChunk_D_Top", "IceChunk_D_Body"],
+    "proxy": ["Proxy_Rover"]
+  },
+  "budget": {"tris": 20000, "bytes": 400000}
+}

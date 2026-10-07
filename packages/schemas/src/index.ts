@@ -1,0 +1,10 @@
+export type Camp = { id: string; name: string; x: number; y: number; kind: "camp" | "depot" | "station" };
+export type Weights = { risk: number; support: number };
+export type Route = { id: string; name: string; points: [number, number][]; weights: Weights };
+export type RouteMetrics = { distanceKm: number; meanRisk: number; maxRisk: number; minThicknessCm: number; etaH: number; fuelL: number; supportPct: number; stormExposureH: number; thinCrossings: number };
+export type WeatherHour = { hour: number; at: string; tempC: number; windMs: number; visibilityKm: number; storm: number };
+export type VehicleStatus = "Moving" | "Holding" | "Refuel" | "Caution" | "Arrived";
+export type TelemetrySample = { vehicleId: string; hour: number; at: string; x: number; y: number; headingDeg: number; speedKmh: number; fuelPct: number; tempC: number; status: VehicleStatus };
+export type Vehicle = { id: string; name: string; routeId: string; departHour: number; color: string };
+export type Pass = { id: string; sensor: "SAR" | "Optical" | "Microwave"; label: string; hour: number; at: string; swath: { x0: number; y0: number; x1: number; y1: number }; cloud: number; resolutionKm: number };
+export type Expedition = { id: string; name: string; region: string; start: string; end: string; camps: Camp[] };
