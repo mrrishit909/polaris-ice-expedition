@@ -1,6 +1,6 @@
 # QA report
 
-Apple M3 Pro, Chrome stable, Playwright 1.63, WebGL through SwiftShader. Last full runs: 24 e2e passed three times in a row after the final fix; 34 unit and API tests passed.
+Apple M3 Pro, Chrome stable, Playwright 1.63, WebGL through SwiftShader. Last full runs: 25 e2e passed three times in a row after the final fix; 34 unit and API tests passed.
 
 | Matrix row (blueprint 18) | Covered by | Result |
 |---|---|---|
@@ -16,5 +16,7 @@ Apple M3 Pro, Chrome stable, Playwright 1.63, WebGL through SwiftShader. Last fu
 | Performance | budgets in tests/e2e/performance.spec.ts | pass |
 
 **Not validated against the real world.** The bearing rule, the weather, the satellite retrievals and the telemetry are invented; they are checked against the code that implements them.
+
+Defects found after release: the storm layer, the aurora and the snow did not respond (the storm haze stayed where hour 0 would put it) because their shader uniforms were mutated through the object passed to `<shaderMaterial uniforms>`, which the renderer does not read; they are now set through the material's own `uniforms`, and a test checks the storm layer's front position after the hour changes.
 
 Defects found during the build: the crack could not be seen against a white world, so the world now darkens to dusk before it forms; `smoothstep` with reversed edges is undefined in GLSL and made the ice texture noisy (all three uses rewritten); the first camera sat behind the sled and showed only cargo, so the intro now tracks from the side; the intro rover would have jumped when the hour-driven rovers took over, so it is a separate rover that shrinks away; a keyboard test that pressed two arrow keys in a row was flaky until it waited for the first press to land.

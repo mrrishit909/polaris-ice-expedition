@@ -16,7 +16,7 @@ npm run seed                      # ice, weather, routes, telemetry, passes
 npm run model                     # Blender 4.5: build.py then validate.py (the GLB is committed, so optional)
 npm test                          # 34 domain + API tests
 npm run build && node scripts/serve.ts 8701   # static export at http://127.0.0.1:8701
-npm run e2e                       # 24 Playwright tests (needs Google Chrome)
+npm run e2e                       # 25 Playwright tests (needs Google Chrome)
 node apps/api/src/server.ts       # /v1 API on :8700, OpenAPI at /openapi.json, WebSocket at /v1/vehicles/live
 ```
 `?skip=1`, `?view=map|ice|weather|rovers|satellite|routes`, `&hour=0..71.75`, `?gfx=off`, `?motion=reduced`.

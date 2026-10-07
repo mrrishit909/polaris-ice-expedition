@@ -88,7 +88,7 @@ function Rover({ data, id, intro }: { data: Data; id: string; intro?: boolean })
 }
 function Storm() {
   const s = useStore(), mat = useRef<THREE.ShaderMaterial>(null), u = useMemo(() => ({ uFront: { value: 0 }, uSigma: { value: FRONT.sigmaKm / 2 }, uDir: { value: new THREE.Vector2(FRONT.dirX, -FRONT.dirY) }, uTime: { value: 0 }, uOn: { value: 1 } }), []);
-  useFrame(({ clock }) => { if (!mat.current) return; u.uFront.value = frontPos(state.hour) / 2; u.uTime.value = state.pauseMotion ? u.uTime.value : clock.elapsedTime; u.uOn.value = state.showStorm && state.introDone ? 1 : 0; });
+  useFrame(({ clock }) => { if (!mat.current) return; const U = mat.current.uniforms; (window as unknown as { __pStorm: () => number }).__pStorm = () => U.uFront.value; U.uFront.value = frontPos(state.hour) / 2; U.uTime.value = state.pauseMotion ? U.uTime.value : clock.elapsedTime; U.uOn.value = state.showStorm && state.introDone ? 1 : 0; });
   if (!s.showStorm) return null;
   return <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 4.5, 0]} renderOrder={5}><planeGeometry args={[150, 100, 1, 1]} /><shaderMaterial ref={mat} uniforms={u} transparent depthWrite={false} vertexShader={`varying vec3 vP; void main(){ vP = (modelMatrix*vec4(position,1.0)).xyz; gl_Position = projectionMatrix*viewMatrix*vec4(vP,1.0); }`}
     fragmentShader={`uniform float uFront, uSigma, uTime, uOn; uniform vec2 uDir; varying vec3 vP; ${GLSL_NOISE}
@@ -97,7 +97,7 @@ function Storm() {
 }
 function Aurora() {
   const mat = useRef<THREE.ShaderMaterial>(null), u = useMemo(() => ({ uTime: { value: 0 }, uI: { value: 0.5 } }), []);
-  useFrame(({ clock }) => { u.uTime.value = state.pauseMotion ? u.uTime.value : clock.elapsedTime; const target = state.introDone ? 0.3 + 0.06 * VIEWS.findIndex((v) => v.id === state.view) : live.aurora; u.uI.value += (target - u.uI.value) * 0.05; });
+  useFrame(({ clock }) => { const U = mat.current?.uniforms ?? u; U.uTime.value = state.pauseMotion ? U.uTime.value : clock.elapsedTime; const target = state.introDone ? 0.3 + 0.06 * VIEWS.findIndex((v) => v.id === state.view) : live.aurora; U.uI.value += (target - U.uI.value) * 0.05; });
   return <mesh renderOrder={-2}><sphereGeometry args={[160, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2]} /><shaderMaterial ref={mat} uniforms={u} side={THREE.BackSide} transparent depthWrite={false} blending={THREE.AdditiveBlending} fog={false}
     vertexShader={`varying vec3 vD; void main(){ vD = normalize(position); gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0); }`}
     fragmentShader={`uniform float uTime, uI; varying vec3 vD; ${GLSL_NOISE}
@@ -106,7 +106,7 @@ function Aurora() {
 function Snow() {
   const pts = useRef<THREE.Points>(null), { camera } = useThree(), N = 1600, u = useMemo(() => ({ uTime: { value: 0 }, uI: { value: 0.3 }, uCam: { value: new THREE.Vector3() } }), []);
   const geo = useMemo(() => { const g = new THREE.BufferGeometry(), r = mulberry32(3), a = new Float32Array(N * 3); for (let i = 0; i < N * 3; i++) a[i] = r(); g.setAttribute("position", new THREE.BufferAttribute(a, 3)); return g; }, []);
-  useFrame(({ clock }) => { u.uTime.value = state.pauseMotion ? u.uTime.value : clock.elapsedTime; const storm = Math.exp(-(((state.hour - 35) / 6) ** 2)); const fade = Math.max(0, Math.min(1, 1 - (camera.position.y - 30) / 50)); u.uI.value = (state.introDone ? (state.reduced ? 0 : 0.12 + 0.5 * storm * (state.view === "weather" ? 1 : 0.4)) : live.snow) * (state.introDone ? fade : 1); u.uCam.value.copy(camera.position); });
+  useFrame(({ clock }) => { const U = (pts.current?.material as THREE.ShaderMaterial | undefined)?.uniforms ?? u; U.uTime.value = state.pauseMotion ? U.uTime.value : clock.elapsedTime; const storm = Math.exp(-(((state.hour - 35) / 6) ** 2)); const fade = Math.max(0, Math.min(1, 1 - (camera.position.y - 30) / 50)); U.uI.value = (state.introDone ? (state.reduced ? 0 : 0.12 + 0.5 * storm * (state.view === "weather" ? 1 : 0.4)) : live.snow) * (state.introDone ? fade : 1); U.uCam.value.copy(camera.position); });
   return <points ref={pts} geometry={geo} frustumCulled={false} renderOrder={6}><shaderMaterial uniforms={u} transparent depthWrite={false} fog={false}
     vertexShader={`uniform float uTime, uI; uniform vec3 uCam; varying float vA; void main(){ vec3 box = vec3(40.0, 18.0, 40.0); vec3 p = position*box; p.x += uTime*(3.0+position.y*2.0); p.y -= uTime*(1.2+position.z); p.z += uTime*1.0; p = mod(p, box) - box*0.5; vec3 w = p + vec3(uCam.x, max(uCam.y*0.6, 4.0), uCam.z); vA = uI*(0.4+0.6*fract(position.x*37.0)); vec4 mv = viewMatrix*vec4(w,1.0); gl_PointSize = min(7.0, (1.2 + 2.2*position.z)*(40.0/ -mv.z)); gl_Position = projectionMatrix*mv; }`}
     fragmentShader={`varying float vA; void main(){ float d = length(gl_PointCoord-0.5); if(d>0.5) discard; gl_FragColor = vec4(0.9,0.97,1.0, vA*(1.0 - smoothstep(0.1,0.5,d))); }`} /></points>;

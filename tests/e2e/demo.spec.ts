@@ -56,3 +56,7 @@ test("the intro's crack becomes the route: the glow is complete and the camera h
   await page.goto("/"); await page.waitForFunction(() => (window as unknown as W).__pLive?.crack > 0.2, null, { timeout: 40_000 }); const mid = await page.evaluate(() => (window as unknown as W).__pLive.routeGlow); expect(mid).toBeLessThan(1);
   await page.getByTestId("skip-intro").click(); await expect(page.getByTestId("intro")).toHaveCount(0, { timeout: 40_000 }); const L = await page.evaluate(() => (window as unknown as W).__pLive); expect(L.routeGlow).toBe(1); expect(L.camT).toBe(3); expect(L.introRover).toBe(0);
 });
+test("the 3D storm layer follows the hour (its uniform is set through the material, not a copy)", async ({ page }) => {
+  await open(page, "/?skip=1&view=weather&hour=10"); await page.waitForFunction(() => typeof (window as unknown as { __pStorm?: unknown }).__pStorm === "function", null, { timeout: 30_000 }); const a = await page.evaluate(() => (window as unknown as { __pStorm: () => number }).__pStorm());
+  await page.getByTestId("hour").fill("50"); await expect.poll(() => page.evaluate(() => (window as unknown as { __pStorm: () => number }).__pStorm())).toBeGreaterThan(a + 20);
+});
